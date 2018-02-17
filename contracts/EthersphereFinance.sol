@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 import "./EthersphereDeed.sol";
 
 /// @dev Holds functionality for finance related to plots.
-contract EtherspherFinance is EthersphereDeed {
+contract EthersphereFinance is EthersphereDeed {
     /// Total amount of Ether yet to be paid to auction beneficiaries.
     uint256 public outstandingEther = 0 ether;
 
