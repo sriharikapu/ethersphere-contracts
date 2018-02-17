@@ -25,6 +25,7 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
         _deedSymbol = "ESP";
     }
 
+    // ERC165
     /// @dev ERC-165 (draft) interface signature for itself
     bytes4 internal constant INTERFACE_SIGNATURE_ERC165 = // 0x01ffc9a7
     bytes4(keccak256('supportsInterface(bytes4)'));
@@ -47,7 +48,11 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @notice Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     /// Returns true for any standardized interfaces implemented by this contract.
     /// (ERC-165 and ERC-721.)
-    function supportsInterface(bytes4 _interfaceID) external pure returns (bool) {
+    function supportsInterface(bytes4 _interfaceID)
+        external
+        pure
+        returns (bool)
+    {
         return (
         (_interfaceID == INTERFACE_SIGNATURE_ERC165)
         || (_interfaceID == INTERFACE_SIGNATURE_ERC721)
@@ -58,7 +63,11 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @dev Checks if a given address owns a particular plot.
     /// @param _owner The address of the owner to check for.
     /// @param _deedId The plot identifier to check for.
-    function _owns(address _owner, uint256 _deedId) internal view returns (bool) {
+    function _owns(address _owner, uint256 _deedId)
+        internal
+        view
+        returns (bool)
+    {
         return identifierToOwner[_deedId] == _owner;
     }
 
@@ -66,7 +75,9 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @param _from The address approving taking ownership.
     /// @param _to The address to approve taking ownership.
     /// @param _deedId The identifier of the deed to give approval for.
-    function _approve(address _from, address _to, uint256 _deedId) internal {
+    function _approve(address _from, address _to, uint256 _deedId)
+        internal
+    {
         identifierToApproved[_deedId] = _to;
 
         // Emit event.
@@ -76,7 +87,11 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @dev Checks if a given address has approval to take ownership of a deed.
     /// @param _claimant The address of the claimant to check for.
     /// @param _deedId The identifier of the deed to check for.
-    function _approvedFor(address _claimant, uint256 _deedId) internal view returns (bool) {
+    function _approvedFor(address _claimant, uint256 _deedId)
+        internal
+        view
+        returns (bool)
+    {
         return identifierToApproved[_deedId] == _claimant;
     }
 
@@ -84,7 +99,9 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @param _from The address to transfer the deed from.
     /// @param _to The address to transfer the deed to.
     /// @param _deedId The identifier of the deed to transfer.
-    function _transfer(address _from, address _to, uint256 _deedId) internal {
+    function _transfer(address _from, address _to, uint256 _deedId)
+        internal
+    {
         // The number of plots is capped at 2^16 * 2^16, so this cannot
         // be overflowed.
         ownershipDeedCount[_to]++;
@@ -109,20 +126,32 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
 
     /// @notice Returns the total number of deeds currently in existence.
     /// @dev Required for ERC-721 compliance.
-    function countOfDeeds() public view returns (uint256) {
+    function countOfDeeds()
+        public
+        view
+        returns (uint256)
+    {
         return plots.length;
     }
 
     /// @notice Returns the number of deeds owned by a specific address.
     /// @param _owner The owner address to check.
     /// @dev Required for ERC-721 compliance
-    function countOfDeedsByOwner(address _owner) public view returns (uint256) {
+    function countOfDeedsByOwner(address _owner)
+        public
+        view
+        returns (uint256)
+    {
         return ownershipDeedCount[_owner];
     }
 
     /// @notice Returns the address currently assigned ownership of a given deed.
     /// @dev Required for ERC-721 compliance.
-    function ownerOf(uint256 _deedId) external view returns (address _owner) {
+    function ownerOf(uint256 _deedId)
+        external
+        view
+        returns (address _owner)
+    {
         _owner = identifierToOwner[_deedId];
 
         require(_owner != address(0));
@@ -132,7 +161,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @param _to The address to approve taking owernship.
     /// @param _deedId The identifier of the deed to give approval for.
     /// @dev Required for ERC-721 compliance.
-    function approve(address _to, uint256 _deedId) external whenNotPaused {
+    function approve(address _to, uint256 _deedId)
+        external
+        whenNotPaused
+    {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
 
@@ -142,7 +174,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @notice Approve a given address to take ownership of multiple deeds.
     /// @param _to The address to approve taking ownership.
     /// @param _deedIds The identifiers of the deeds to give approval for.
-    function approveMultiple(address _to, uint256[] _deedIds) public whenNotPaused {
+    function approveMultiple(address _to, uint256[] _deedIds)
+        public
+        whenNotPaused
+    {
         // Ensure the sender is not approving themselves.
         require(msg.sender != _to);
 
@@ -163,7 +198,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @param _to The address of the recipient, can be a user or contract.
     /// @param _deedId The identifier of the deed to transfer.
     /// @dev Required for ERC-721 compliance.
-    function transfer(address _to, uint256 _deedId) external whenNotPaused {
+    function transfer(address _to, uint256 _deedId)
+        external
+        whenNotPaused
+    {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
 
@@ -175,7 +213,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// or your deeds may be lost forever.
     /// @param _to The address of the recipient, can be a user or contract.
     /// @param _deedIds The identifiers of the deeds to transfer.
-    function transferMultiple(address _to, uint256[] _deedIds) public whenNotPaused {
+    function transferMultiple(address _to, uint256[] _deedIds)
+        public
+        whenNotPaused
+    {
         // Safety check to prevent against an unexpected 0x0 default.
         require(_to != address(0));
 
@@ -197,7 +238,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// address has previously been granted transfer approval by the owner.
     /// @param _deedId The identifier of the deed to be transferred.
     /// @dev Required for ERC-721 compliance.
-    function takeOwnership(uint256 _deedId) external whenNotPaused {
+    function takeOwnership(uint256 _deedId)
+        external
+        whenNotPaused
+    {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
 
@@ -207,7 +251,10 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @notice Transfer multiple deeds owned by another address, for which the
     /// calling address has previously been granted transfer approval by the owner.
     /// @param _deedIds The identifier of the deed to be transferred.
-    function takeOwnershipMultiple(uint256[] _deedIds) public whenNotPaused {
+    function takeOwnershipMultiple(uint256[] _deedIds)
+        public
+        whenNotPaused
+    {
         for (uint256 i = 0; i < _deedIds.length; i++) {
             uint256 _deedId = _deedIds[i];
             address _from = identifierToOwner[_deedId];
@@ -225,7 +272,11 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @dev This method MUST NEVER be called by smart contract code. It's very
     /// expensive and is not supported in contract-to-contract calls as it returns
     /// a dynamic array (only supported for web3 calls).
-    function deedsOfOwner(address _owner) external view returns(uint256[]) {
+    function deedsOfOwner(address _owner)
+        external
+        view
+        returns(uint256[])
+    {
         uint256 deedCount = countOfDeedsByOwner(_owner);
 
         if (deedCount == 0) {
@@ -251,7 +302,11 @@ contract EthersphereDeed is EthersphereBase, ERC721, ERC721Metadata {
     /// @notice Returns a deed identifier of the owner at the given index.
     /// @param _owner The address of the owner we want to get a deed for.
     /// @param _index The index of the deed we want.
-    function deedOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256) {
+    function deedOfOwnerByIndex(address _owner, uint256 _index)
+        external
+        view
+        returns (uint256)
+    {
         // The index should be valid.
         require(_index < countOfDeedsByOwner(_owner));
 
