@@ -1,30 +1,16 @@
 pragma solidity ^0.4.18;
 
 contract EthersphereCore {
-    /// If this contract is broken, this will be used to publish the address at which an upgraded contract can be found
-    address public upgradedContractAddress;
-    event ContractUpgrade(address upgradedContractAddress);
 
-    function DWorldCore(
+    function EthersphereCore(
         address originalContractAddress,
         address originalSaleAuctionAddress,
         address originalRentAuctionAddress,
         uint256 buyoutsEnabledAfterHours
     )
-    DWorldUpgrade(originalContractAddress, originalSaleAuctionAddress, originalRentAuctionAddress)
-    public
-    {
-        buyoutsEnabledFromTimestamp = block.timestamp + buyoutsEnabledAfterHours * 3600;
-    }
-
-    /// @notice Only to be used when this contract is significantly broken,
-    /// and an upgrade is required.
-    function setUpgradedContractAddress(address _upgradedContractAddress) external onlyOwner whenPaused {
-        upgradedContractAddress = _upgradedContractAddress;
-        ContractUpgrade(_upgradedContractAddress);
-    }
 
     /// @notice Set the data associated with a plot.
+    /// Called by the owner AFTER the plot has been purchased
     function setPlotData(uint256 _deedId, string name, string description, string imageUrl, string infoUrl)
     public
     whenNotPaused
@@ -70,7 +56,10 @@ contract EthersphereCore {
     }
 
     /// @notice Withdraw (unowed) contract balance.
-    function withdrawFreeBalance() external onlyCFO {
+    function withdrawFreeBalance()
+        external
+        onlyCFO
+    {
         // Calculate the free (unowed) balance. This never underflows, as
         // outstandingEther is guaranteed to be less than or equal to the
         // contract balance.
