@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 import "./EthersphereFinance.sol";
 
 /// @dev Holds functionality for minting new plot deeds.
-contract EthersphereMinting is EthersphereFinance {
+contract EthersphereMinting is Pausable, EthersphereFinance {
     /// @notice Buy an unclaimed plot.
     /// @param _deedId The unclaimed plot to buy.
     /// @param _buyoutPrice The initial buyout price to set on the plot.
@@ -105,12 +105,8 @@ contract EthersphereMinting is EthersphereFinance {
             // Set the plot data.
             _setPlotData(_deedId, name, description, imageUrl, infoUrl);
 
-            // Calculate and assign claim dividends.
-            uint256 claimDividends = _calculateAndAssignClaimDividends(_deedId);
-            etherRequired = etherRequired.add(claimDividends);
-
             // Set the initial price paid for the plot.
-            initialPricePaid[_deedId] = unclaimedPlotPrice.add(claimDividends);
+            initialPricePaid[_deedId] = unclaimedPlotPrice;
 
             // Set the initial buyout price. Throws if it does not succeed.
             setInitialBuyoutPrice(_deedId, _buyoutPrice);

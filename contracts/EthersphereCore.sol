@@ -1,13 +1,9 @@
 pragma solidity ^0.4.18;
 
-contract EthersphereCore {
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import './EthersphereAccessControl.sol';
 
-    function EthersphereCore(
-        address originalContractAddress,
-        address originalSaleAuctionAddress,
-        address originalRentAuctionAddress,
-        uint256 buyoutsEnabledAfterHours
-    )
+contract EthersphereCore is Pausable, EthersphereAccessControl, EthersphereBase, EthersphereDeed, EthersphereFinance, EthersphereMinting {
 
     /// @notice Set the data associated with a plot.
     /// Called by the owner AFTER the plot has been purchased
@@ -57,8 +53,8 @@ contract EthersphereCore {
 
     /// @notice Withdraw (unowed) contract balance.
     function withdrawFreeBalance()
-        external
-        onlyCFO
+    external
+    onlyCFO
     {
         // Calculate the free (unowed) balance. This never underflows, as
         // outstandingEther is guaranteed to be less than or equal to the
