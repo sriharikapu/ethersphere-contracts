@@ -1,5 +1,6 @@
 build/
 .idea/
 truffle-config.js
+node_modules
 .soliumignore
 .soliumrc.json
