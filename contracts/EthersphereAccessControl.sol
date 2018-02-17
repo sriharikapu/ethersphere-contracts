@@ -8,7 +8,9 @@ import "zeppelin-solidity/contracts/ownership/CanReclaimToken.sol";
 contract EthersphereAccessControl is Claimable, Pausable, CanReclaimToken {
     address public cfoAddress;
 
-    function EthersphereAccessControl() public {
+    function EthersphereAccessControl()
+        public
+    {
         // The creator of the contract is the initial CFO.
         cfoAddress = msg.sender;
     }
