@@ -13,9 +13,6 @@ contract EthersphereBase is EthersphereAccessControl {
     mapping (uint256 => address) identifierToApproved;
     mapping (address => uint256) ownershipDeedCount;
 
-    // Boolean indicating whether the plot was bought before the migration.
-    mapping (uint256 => bool) public identifierIsOriginal;
-
     // Events
     event SetData(uint256 indexed deedId, string name, string description, string imageUrl, string infoUrl);
 
@@ -34,7 +31,7 @@ contract EthersphereBase is EthersphereAccessControl {
     function coordinateToIdentifier(uint256 x, uint256 y)
         public
         pure
-        returns(uint256)
+        returns(uint32)
     {
         require(validCoordinate(x, y));
         return (y << 32) + x;
