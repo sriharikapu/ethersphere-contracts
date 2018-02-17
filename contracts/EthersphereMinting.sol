@@ -7,7 +7,11 @@ contract EthersphereMinting is EthersphereFinance {
     /// @notice Buy an unclaimed plot.
     /// @param _deedId The unclaimed plot to buy.
     /// @param _buyoutPrice The initial buyout price to set on the plot.
-    function claimPlot(uint256 _deedId, uint256 _buyoutPrice) external payable whenNotPaused {
+    function claimPlot(uint256 _deedId, uint256 _buyoutPrice)
+        external
+        payable
+        whenNotPaused
+    {
         claimPlotWithData(_deedId, _buyoutPrice, "", "", "", "");
     }
 
@@ -18,7 +22,11 @@ contract EthersphereMinting is EthersphereFinance {
     /// @param description The description to add to the plot.
     /// @param imageUrl The image url for the plot.
     /// @param infoUrl The info url for the plot.
-    function claimPlotWithData(uint256 _deedId, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl) public payable whenNotPaused {
+    function claimPlotWithData(uint256 _deedId, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl)
+        public
+        payable
+        whenNotPaused
+    {
         uint256[] memory _deedIds = new uint256[](1);
         _deedIds[0] = _deedId;
 
@@ -28,7 +36,11 @@ contract EthersphereMinting is EthersphereFinance {
     /// @notice Buy unclaimed plots.
     /// @param _deedIds The unclaimed plots to buy.
     /// @param _buyoutPrice The initial buyout price to set on the plot.
-    function claimPlotMultiple(uint256[] _deedIds, uint256 _buyoutPrice) external payable whenNotPaused {
+    function claimPlotMultiple(uint256[] _deedIds, uint256 _buyoutPrice)
+        external
+        payable
+        whenNotPaused
+    {
         claimPlotMultipleWithData(_deedIds, _buyoutPrice, "", "", "", "");
     }
 
@@ -39,7 +51,11 @@ contract EthersphereMinting is EthersphereFinance {
     /// @param description The description to add to the plots.
     /// @param imageUrl The image url for the plots.
     /// @param infoUrl The info url for the plots.
-    function claimPlotMultipleWithData(uint256[] _deedIds, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl) public payable whenNotPaused {
+    function claimPlotMultipleWithData(uint256[] _deedIds, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl)
+        public
+        payable
+        whenNotPaused
+    {
         uint256 buyAmount = _deedIds.length;
         uint256 etherRequired;
         if (freeClaimAllowance[msg.sender] > 0) {
