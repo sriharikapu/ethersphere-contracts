@@ -1,6 +1,7 @@
 testrpc:
 	testrpc \
 		--networkId 50 \
+		--gasLimit 70000000 \
 		-p 8545 \
 		-m "concert load couple harbor equip island argue ramp clarify fence smart topic" \
         --account="0xbac278edb90b958b3ca0a0e2a202700758df34d7de40e831434a648762b01000,10000000000000000000000000" \
