@@ -1,10 +1,13 @@
 pragma solidity ^0.4.18;
 
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "./EthersphereCube.sol";
 
 /// @dev Holds functionality for finance related to cubes.
 /// @dev Holds functionality for finance related to cubes.
 contract EthersphereFinance is EthersphereAccessControl, EthersphereCube {
+    using SafeMath for uint256;
+
     /// Total amount of Ether yet to be paid to auction beneficiaries.
     uint256 public outstandingEther = 0 ether;
 
@@ -132,8 +135,8 @@ contract EthersphereFinance is EthersphereAccessControl, EthersphereCube {
     /// @param currentOwner The current owner of the cube that is being bought out.
     /// @param _cubeId The identifier of the cube that is being bought out.
     function _calculateAndAssignBuyoutProceeds(address currentOwner, uint256 _cubeId)
-    internal
-    returns (uint256 totalCost)
+        internal
+        returns (uint256 totalCost)
     {
         // The current price.
         uint256 price = identifierToBuyoutPrice[_cubeId];
@@ -155,25 +158,35 @@ contract EthersphereFinance is EthersphereAccessControl, EthersphereCube {
 
     /// @notice Buy the current owner out of the cube.
     function buyout(uint256 _cubeId)
-    external
-    payable
-    whenNotPaused
+        external
+        payable
+        whenNotPaused
     {
         buyoutWithData(_cubeId, "", "", "", "");
     }
 
     /// @dev Send ether to the fund collection wallet. If the user is msg.sender, send and log. If not, just log.
     function forwardFunds()
-    internal
+        internal
     {
         cfoAddress.transfer(msg.value);
     }
 
+    /// @dev Send ether to the fund collection wallet. If the user is msg.sender, send and log. If not, just log.
+    function forwardFundsBuyout()
+        internal
+    {
+        uint256 cfoAmount = msg.value.div(98);
+        uint256 payout = msg.value.sub(cfoAmount);
+        msg.sender.transfer(payout);
+        cfoAddress.transfer(cfoAmount);
+    }
+
     /// @notice Buy the current owner out of the cube.
     function buyoutWithData(uint256 _cubeId, string name, string description, string imageUrl, string infoUrl)
-    public
-    payable
-    whenNotPaused
+        public
+        payable
+        whenNotPaused
     {
         address currentOwner = identifierToOwner[_cubeId];
 
@@ -200,7 +213,7 @@ contract EthersphereFinance is EthersphereAccessControl, EthersphereCube {
             identifierToBoughtOutOnce[_cubeId] = true;
         }
 
-        forwardFunds();
+        forwardFundsBuyout();
     }
 
     /// @notice Calculate the maximum initial buyout price for a cube.
