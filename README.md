@@ -5,7 +5,6 @@
 ## Table of Contents
 
 * [Description](#description)
-* [Assumptions](#assumptions)
 * [Contracts](#contracts)
 * [Resources](#resources)
 * [License](#license)
@@ -19,11 +18,7 @@ for the world to see. People can outbid other's for a desirable location, such a
 The contract uses ERC721 to divide the world into non-fungible cube for users to purchase. A user can use the 
 ethersphere.am interface to easily purchase a cube. 
 
-The owner of a cube can now purchase on object on a cube and sell a cube
-
-## Assumptions
-- The price of the initial location can be changed due to the extreme volatility of the price of ETH.
-
+The owner of a cube can now purchase on object on a cube and sell a cube.
 
 ## Contracts
 ### Ethersphere Contracts
