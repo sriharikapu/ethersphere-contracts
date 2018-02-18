@@ -1,62 +1,43 @@
 pragma solidity ^0.4.18;
 
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./EthersphereFinance.sol";
+import "./EthersphereBase.sol";
 
-/// @dev Holds functionality for minting new plot deeds.
+/// @dev Holds functionality for minting new cube cubes.
 contract EthersphereMinting is Pausable, EthersphereFinance {
-    /// @notice Buy an unclaimed plot.
-    /// @param _deedId The unclaimed plot to buy.
-    /// @param _buyoutPrice The initial buyout price to set on the plot.
-    function claimPlot(uint256 _deedId, uint256 _buyoutPrice)
-        external
-        payable
-        whenNotPaused
+
+    /// @notice Buy unclaimed cubes.
+    /// @param _cubeIds The unclaimed cubes to buy.
+    /// @param _buyoutPrice The initial buyout price to set on the cube.
+    function claimCubeMultiple(uint256[] _cubeIds, uint256 _buyoutPrice)
+    external
+    payable
+    whenNotPaused
     {
-        claimPlotWithData(_deedId, _buyoutPrice, "", "", "", "");
+        claimCubeMultipleWithData(_cubeIds, _buyoutPrice, "", "", "", "");
     }
 
-    /// @notice Buy an unclaimed plot.
-    /// @param _deedId The unclaimed plot to buy.
-    /// @param _buyoutPrice The initial buyout price to set on the plot.
-    /// @param name The name to give the plot.
-    /// @param description The description to add to the plot.
-    /// @param imageUrl The image url for the plot.
-    /// @param infoUrl The info url for the plot.
-    function claimPlotWithData(uint256 _deedId, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl)
-        public
-        payable
-        whenNotPaused
+    /// @dev Send ether to the fund collection wallet. If the user is msg.sender, send and log. If not, just log.
+    function forwardFunds()
+    internal
     {
-        uint256[] memory _deedIds = new uint256[](1);
-        _deedIds[0] = _deedId;
-
-        claimPlotMultipleWithData(_deedIds, _buyoutPrice, name, description, imageUrl, infoUrl);
+        cfoAddress.transfer(msg.value);
     }
 
-    /// @notice Buy unclaimed plots.
-    /// @param _deedIds The unclaimed plots to buy.
-    /// @param _buyoutPrice The initial buyout price to set on the plot.
-    function claimPlotMultiple(uint256[] _deedIds, uint256 _buyoutPrice)
-        external
-        payable
-        whenNotPaused
+    /// @notice Buy unclaimed cubes.
+    /// @param _cubeIds The unclaimed cubes to buy.
+    /// @param _buyoutPrice The initial buyout price to set on the cube.
+    /// @param name The name to give the cubes.
+    /// @param description The description to add to the cubes.
+    /// @param imageUrl The image url for the cubes.
+    /// @param infoUrl The info url for the cubes.
+    function claimCubeMultipleWithData(uint256[] _cubeIds, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl)
+    public
+    payable
+    whenNotPaused
     {
-        claimPlotMultipleWithData(_deedIds, _buyoutPrice, "", "", "", "");
-    }
-
-    /// @notice Buy unclaimed plots.
-    /// @param _deedIds The unclaimed plots to buy.
-    /// @param _buyoutPrice The initial buyout price to set on the plot.
-    /// @param name The name to give the plots.
-    /// @param description The description to add to the plots.
-    /// @param imageUrl The image url for the plots.
-    /// @param infoUrl The info url for the plots.
-    function claimPlotMultipleWithData(uint256[] _deedIds, uint256 _buyoutPrice, string name, string description, string imageUrl, string infoUrl)
-        public
-        payable
-        whenNotPaused
-    {
-        uint256 buyAmount = _deedIds.length;
+        uint256 buyAmount = _cubeIds.length;
         uint256 etherRequired;
         if (freeClaimAllowance[msg.sender] > 0) {
             // The sender has a free claim allowance.
@@ -73,57 +54,56 @@ contract EthersphereMinting is Pausable, EthersphereFinance {
                 delete freeClaimAllowance[msg.sender];
 
                 // The subtraction cannot underflow, as freeAmount <= buyAmount.
-                etherRequired = unclaimedPlotPrice.mul(buyAmount - freeAmount);
+                etherRequired = unclaimedCubePrice.mul(buyAmount - freeAmount);
             }
         } else {
             // The sender does not have a free claim allowance.
-            etherRequired = unclaimedPlotPrice.mul(buyAmount);
+            etherRequired = unclaimedCubePrice.mul(buyAmount);
         }
 
-        uint256 offset = plots.length;
+        uint256 offset = cubes.length;
 
-        // Allocate additional memory for the plots array
+        // Allocate additional memory for the cubes array
         // (this is more efficient than .push-ing each individual
-        // plot, as that requires multiple dynamic allocations).
-        plots.length = plots.length.add(_deedIds.length);
+        // cube, as that requires multiple dynamic allocations).
+        cubes.length = cubes.length.add(_cubeIds.length);
 
-        for (uint256 i = 0; i < _deedIds.length; i++) {
-            uint256 _deedId = _deedIds[i];
-            require(validIdentifier(_deedId));
+        for (uint256 i = 0; i < _cubeIds.length; i++) {
+            uint256 _cubeId = _cubeIds[i];
+            require(validIdentifier(_cubeId));
 
-            // The plot must be unowned (a plot deed cannot be transferred to
-            // 0x0, so once a plot is claimed it will always be owned by a
+            // The cube must be unowned (a cube cube cannot be transferred to
+            // 0x0, so once a cube is claimed it will always be owned by a
             // non-zero address).
-            require(identifierToOwner[_deedId] == address(0));
+            require(identifierToOwner[_cubeId] == address(0));
 
-            // Create the plot
-            plots[offset + i] = uint32(_deedId);
+            // Create the cube
+            cubes[offset + i] = uint256(_cubeId);
+            saveData(_cubeId, name, description, imageUrl);
 
-            // Transfer the new plot to the sender.
-            _transfer(address(0), msg.sender, _deedId);
+            // Transfer the new cube to the sender.
+            _transfer(address(0), msg.sender, _cubeId);
 
-            // Set the plot data.
-            _setPlotData(_deedId, name, description, imageUrl, infoUrl);
+            // Set the cube data.
+            _setCubeData(_cubeId, name, description, imageUrl, infoUrl);
 
-            // Set the initial price paid for the plot.
-            initialPricePaid[_deedId] = unclaimedPlotPrice;
+            // Set the initial price paid for the cube.
+            initialPricePaid[_cubeId] = unclaimedCubePrice;
 
             // Set the initial buyout price. Throws if it does not succeed.
-            setInitialBuyoutPrice(_deedId, _buyoutPrice);
+            setInitialBuyoutPrice(_cubeId, _buyoutPrice);
+
         }
 
-        // Ensure enough ether is supplied.
-        require(msg.value >= etherRequired);
+        forwardFunds();
 
-        // Calculate the excess ether sent
-        // msg.value is greater than or equal to etherRequired,
-        // so this cannot underflow.
-        uint256 excess = msg.value - etherRequired;
+    }
 
-        if (excess > 0) {
-            // Refund any excess ether (not susceptible to re-entry attack, as
-            // the owner is assigned before the transfer takes place).
-            msg.sender.transfer(excess);
-        }
+    function saveData(uint _cubeId, string _name, string _description, string _imageUrl)
+    internal
+    {
+        dataName[_cubeId] = _name;
+        dataDescription[_cubeId] = _description;
+        dataImageUrl[_cubeId] = _imageUrl;
     }
 }
