@@ -1,10 +1,14 @@
 ## Ethersphere
 
+> The [Ethersphere](https://ethersphe.re/) Ethereum smart contracts.
+
 ## Table of Contents
 
 * [Description](#description)
 * [Assumptions](#assumptions)
 * [Contracts](#contracts)
+* [Resources](#resources)
+* [License](#license)
 
 
 ## Description
@@ -38,4 +42,11 @@ The owner of a cube can now purchase on object on a cube and sell a cube
 #### [EthersphereMinting.sol](https://github.com/shanefontaine/ethersphere-contracts/blob/master/contracts/EthersphereMinting.sol)
 - Creation of cubes
 
+## Resources
+
+- [Truffle Framework](http://truffleframework.com/)
+
+## License
+
+MIT
 
